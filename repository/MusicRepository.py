@@ -10,10 +10,6 @@ DATABASE_URL = "sqlite+aiosqlite:///./test.db"
 engine = create_async_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 
 
-def seletcionload(j):
-    pass
-
-
 class MusicRepository:
 
     def __init__(self):
@@ -30,13 +26,13 @@ class MusicRepository:
         self.session = None
 
     async def getAlbumAndArtistByAlbumTitle(self, albumName: str) -> Album:
-        ormResult = await self.session.execute(select(Album)
-                                               .where(Album.title == albumName))
+        ormResult = await self.session.execute(
+            select(Album).options(selectinload(Album.artist)).where(Album.title == albumName)
+        )
         result = ormResult.scalar_one_or_none()
         return result
 
 
-async def injectMusiRepository():
+async def injectMusicRepository():
    async with MusicRepository() as repo:
        yield repo
-
