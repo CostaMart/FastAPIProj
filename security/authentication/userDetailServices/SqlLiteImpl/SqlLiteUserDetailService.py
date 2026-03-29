@@ -1,26 +1,19 @@
 ﻿from typing import Set
 
 from sqlalchemy import select
-from sqlalchemy.engine.create import create_engine
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.attributes import Mapped
-from sqlalchemy.sql.sqltypes import String
-from sqlalchemy.testing.schema import mapped_column
 
+from sqlalchemy import  String, create_engine
+from sqlalchemy.orm import declarative_base, mapped_column
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+
+from repository.ormBase import Base
 from security.userAuth import UserAuth
 from security.authentication.userDetailServices.userDetailServiceManager import UserDetailService
 
 
-Base = declarative_base()
-
-async def initSecurityDb():
-    print("database init")
-    DATABASE_URL = "sqlite:///./test.db"
-    engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-    Base.metadata.create_all(engine)
-
 class SqlLiteUserDetailService(UserDetailService):
+    """this sqllite database is NOT crypted, of course this is just an exercise"""
 
     async def __aenter__(self):
         self.session = self.async_sessionmaker()
@@ -58,4 +51,3 @@ class UserAuthOrm(Base):
 
     def getRolesSet(self) -> Set[str]:
         return set(str(self.roles).split(","))
-

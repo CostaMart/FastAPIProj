@@ -1,0 +1,42 @@
+﻿from sqlalchemy import select
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.orm import selectinload
+
+# import tables
+from repository.model.Artist import Artist
+from repository.model.Album import Album
+
+DATABASE_URL = "sqlite+aiosqlite:///./test.db"
+engine = create_async_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+
+
+def seletcionload(j):
+    pass
+
+
+class MusicRepository:
+
+    def __init__(self):
+        self.async_sessionmaker: async_sessionmaker = async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
+        self.session: AsyncSession | None = None
+
+    async def __aenter__(self):
+        self.session = self.async_sessionmaker()
+        await self.session.__aenter__()
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.session.__aexit__(exc_type, exc_val, exc_tb)
+        self.session = None
+
+    async def getAlbumAndArtistByAlbumTitle(self, albumName: str) -> Album:
+        ormResult = await self.session.execute(select(Album)
+                                               .where(Album.title == albumName))
+        result = ormResult.scalar_one_or_none()
+        return result
+
+
+async def injectMusiRepository():
+   async with MusicRepository() as repo:
+       yield repo
+

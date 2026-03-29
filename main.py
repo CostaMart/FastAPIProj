@@ -3,13 +3,13 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from middleware.requestLoggingMiddleware import RequestLoggingMiddleware
+from repository.ormBase import initDb
 from routes.testRoute import rt
-from security.authentication.userDetailServices.SqlLiteImpl.SqlLiteUserDetailService import initSecurityDb
 
 
 @asynccontextmanager
 async def lifespan(application: FastAPI):
-    await initSecurityDb()
+    await initDb()
     yield
 
 logging.basicConfig(level=logging.INFO, format= '%(levelname)s:%(asctime)s - %(name)s -  %(message)s')
