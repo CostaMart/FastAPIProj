@@ -3,6 +3,7 @@ from fastapi.routing import APIRouter
 from fastapi import Depends
 from pydantic import BaseModel
 
+from DTOs.requestDTOs.AlbumDTO import AlbumDTO
 from security.authentication.jwtAuthentication import authenticateWithJwt
 from security.authorization.roleAuthorization import authorizeAnyRole
 from security.userAuth import UserAuth
@@ -18,5 +19,6 @@ def testRoute(salute: str, userAuth: UserAuth = Depends(authenticateWithJwt)):
 async def testPost(albumTitle: str , musicRepo : MusicService = Depends(injectMusicService)):
     return await musicRepo.getAuthorByAlbumName(albumTitle)
 
-class PostBody(BaseModel):
-    salute: str
+@rt.post("/album", dependencies= [Depends(authenticateWithJwt), Depends(authorizeAnyRole({"MARIO"}))])
+async def createAlbum(album : AlbumDTO, musicService : MusicService = Depends(injectMusicService) ):
+    await musicService.createNewAlbum(album)
