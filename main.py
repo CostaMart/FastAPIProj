@@ -1,11 +1,6 @@
 ﻿import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from starlette import status
-from starlette.requests import Request
-from starlette.responses import JSONResponse
-
-from exceptions.customExceptions import NotFoundException
 from exceptions.handlers import registerAllExceptionHandlers
 from middleware.requestLoggingMiddleware import RequestLoggingMiddleware
 from repository.ormBase import initDb
@@ -21,6 +16,7 @@ logging.basicConfig(level=logging.INFO, format= '%(levelname)s:%(asctime)s - %(n
 
 app = FastAPI(lifespan = lifespan)
 
+# exception handlers registration
 registerAllExceptionHandlers(app)
 
 # middleware section

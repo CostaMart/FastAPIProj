@@ -9,7 +9,8 @@ from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_409_CONFLICT, HTTP_404_
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from exceptions.customExceptions import NotFoundException, ResourceAlreadyExistsException, ForbiddenException
+from exceptions.customExceptions import NotFoundException, ResourceAlreadyExistsException, ForbiddenException, \
+    AuthenticationFailedException
 
 logger = logging.getLogger()
 
@@ -50,3 +51,7 @@ def invalid_token_exception_handler(request: Request, exception: InvalidTokenErr
 @handledException(ForbiddenException)
 def forbidden_exception_handler(request: Request, exception: ForbiddenException):
     return JSONResponse(status_code = HTTP_403_FORBIDDEN, content= {"message": f"access denied to resource, with cause: {exception.cause}"})
+
+@handledException(AuthenticationFailedException)
+def authentication_exception_handler(request: Request, exception: AuthenticationFailedException):
+    return JSONResponse(status_code = HTTP_401_UNAUTHORIZED, content= {"message": f"Unauthorized, with reason: {exception.cause}"})

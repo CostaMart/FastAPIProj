@@ -1,5 +1,5 @@
 ﻿from fastapi import Depends
-from exceptions.customExceptions import NotFoundException, ResourceAlreadyExistsException
+from exceptions.customExceptions import NotFoundException
 from repository.MusicRepository import MusicRepository, injectMusicRepository
 from repository.model.Artist import Artist
 from routes.testRoute import AlbumDTO

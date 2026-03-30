@@ -1,11 +1,14 @@
 ﻿
 from fastapi.routing import APIRouter
 from fastapi import Depends
+from starlette.responses import JSONResponse
+from starlette.status import HTTP_201_CREATED
 from DTOs.requestDTOs.AlbumDTO import AlbumDTO
 from security.authentication.jwtAuthentication import authenticateWithJwt
 from security.authorization.roleAuthorization import authorizeAnyRole
 from security.userAuth import UserAuth
 from services.musicService import injectMusicService, MusicService
+
 
 rt = APIRouter()
 
@@ -20,3 +23,7 @@ async def testPost(albumTitle: str , musicRepo : MusicService = Depends(injectMu
 @rt.post("/album", dependencies= [Depends(authenticateWithJwt), Depends(authorizeAnyRole({"MARIO"}))])
 async def createAlbum(album : AlbumDTO, musicService : MusicService = Depends(injectMusicService) ):
     await musicService.createNewAlbum(album)
+    return JSONResponse(status_code=HTTP_201_CREATED, headers= {"location" : f"/album/{album.title}"}, content= {"message": "album created"})
+
+
+

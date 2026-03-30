@@ -35,7 +35,7 @@ async def _getUserDetails(username: str, userDetailService : UserDetailService) 
         userData = await userDetailService.getUserDetails(username)
 
         if userData is None:
-            raise AuthenticationFailedException(username, "Incorrect username")
+            raise AuthenticationFailedException(username = username, cause = "Incorrect username")
         else:
             return userData
 

@@ -36,7 +36,7 @@ class SqlLiteUserDetailService(UserDetailService):
         authOrm = queryResult.scalar_one_or_none()
 
         if authOrm is not None:
-            return UserAuth(str(authOrm.username), str(authOrm.password), authOrm.getRolesSet())
+            return UserAuth(str(authOrm.username), str(authOrm.password), authOrm.roles)
         else:
             return None
 
@@ -47,7 +47,8 @@ class UserAuthOrm(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String, unique=True)
     password: Mapped[str] = mapped_column(String)
-    roles: Mapped[str] = mapped_column(String)
+    _roles: Mapped[str] = mapped_column(String)
 
-    def getRolesSet(self) -> Set[str]:
-        return set(str(self.roles).split(","))
+    @property
+    def roles(self) -> Set[str]:
+        return set(str(self._roles).split(","))
