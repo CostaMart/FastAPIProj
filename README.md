@@ -1,0 +1,2 @@
+This is a simple training project to refresh my FastApi knowledge. I want to integrate a LLM agent capable of producing 
+SQL queries in response to a user input to retrieve information about music albums and authors from the db.
