@@ -1,8 +1,6 @@
 ﻿
 from fastapi.routing import APIRouter
 from fastapi import Depends
-from pydantic import BaseModel
-
 from DTOs.requestDTOs.AlbumDTO import AlbumDTO
 from security.authentication.jwtAuthentication import authenticateWithJwt
 from security.authorization.roleAuthorization import authorizeAnyRole

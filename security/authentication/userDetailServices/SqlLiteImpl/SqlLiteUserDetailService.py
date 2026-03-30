@@ -13,7 +13,7 @@ from security.authentication.userDetailServices.userDetailServiceManager import 
 
 
 class SqlLiteUserDetailService(UserDetailService):
-    """this sqllite database is NOT crypted, of course this is just an exercise"""
+    """this sqllite database is NOT encrypted, of course this is just an exercise"""
 
     async def __aenter__(self):
         self.session = self.async_sessionmaker()

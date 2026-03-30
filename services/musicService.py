@@ -1,6 +1,5 @@
 ﻿from fastapi import Depends
-from fastapi.exceptions import DependencyScopeError, HTTPException
-
+from exceptions.customExceptions import NotFoundException, ResourceAlreadyExistsException
 from repository.MusicRepository import MusicRepository, injectMusicRepository
 from repository.model.Artist import Artist
 from routes.testRoute import AlbumDTO
@@ -19,10 +18,10 @@ class MusicService:
         artist = await self.musicRepository.getArtistByName(album.artist)
 
         if artist is None:
-            raise HTTPException(status_code=404, detail="Artist not found")
+            raise NotFoundException("artist")
 
         if await self.musicRepository.getAlbumAndArtistByAlbumTitle(album.title) is not None:
-            raise HTTPException(status_code=400, detail="Album already exists")
+            return # resource creation is idempotent
 
         await self.musicRepository.createNewAlbum(album.title, artist.id)
 

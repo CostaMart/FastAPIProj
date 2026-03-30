@@ -1,8 +1,9 @@
 ﻿from enum import Enum
 from typing import Set
 
-from fastapi import HTTPException, Depends
+from fastapi import Depends
 
+from exceptions.customExceptions import ForbiddenException
 from security.SecurityContext import injectSecurityContext, SecurityContext
 
 
@@ -19,7 +20,7 @@ def authorizeAnyRole(requiredRoles: Set[str]):
         userRole = securityContext.userAuth.roles
 
         if not _hasAnyRole(requiredRoles, userRole):
-            raise HTTPException(status_code=403, detail="forbidden")
+            raise ForbiddenException(cause = "Insufficient permissions")
 
     return checker
 
@@ -30,6 +31,6 @@ def authorizeWithAllRoles(requiredRoles: Set[str]):
         userRole = securityContext.userAuth.roles
 
         if not _hasAllRoles(requiredRoles, userRole):
-            raise HTTPException(status_code=403, detail="forbidden")
+            raise ForbiddenException(cause = "Insufficient permissions")
 
     return checker
