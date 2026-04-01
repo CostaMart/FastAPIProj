@@ -1,15 +1,12 @@
 ﻿from fastapi.security import OAuth2PasswordBearer, HTTPBasicCredentials, HTTPBasic
 from fastapi import Depends
-from jwt import decode
-from passlib.context import CryptContext
-
 from exceptions.customExceptions import AuthenticationFailedException
-from getBasicCredentials.EncryptionContext import getEncryptionContext
-from getBasicCredentials.SecurityContext import injectSecurityContext, SecurityContext
-from getBasicCredentials.authentication.userDetailServices.userDetailServiceInjector import getUserDetailService
-from getBasicCredentials.authentication.userDetailServices.userDetailServiceManager import UserDetailService
-from getBasicCredentials.jwtService import KEY
-from getBasicCredentials.userAuth import UserAuth
+from security.encription.EncryptionContext import getEncryptionContext
+from security.SecurityContext import injectSecurityContext, SecurityContext
+from security.userDetailServices import UserDetailService
+from security.jwtService import JwtExtractCredentials
+from security.userAuth import UserAuth
+from security.userDetailServices.userDetailServiceInjector import getUserDetailService
 
 getBearerToken = OAuth2PasswordBearer(tokenUrl="token")
 getBasicCredentials = HTTPBasic()
@@ -20,10 +17,12 @@ async def authenticateWithJwt(
         securityContext : SecurityContext = Depends(injectSecurityContext)
 ):
 
-    username, passwordClaim =  _extractCredentials(token)
+    username, passwordClaim =  JwtExtractCredentials(token)
     userDetails = await _getUserDetails(username, userDetailService)
 
     _authenticate(userDetails, passwordClaim)
+    userDetails.password = passwordClaim
+
     securityContext.injectUserAuth(userDetails)
 
     return userDetails
@@ -36,16 +35,11 @@ async def authenticateWithBasic(
     username = credentials.username
     userDetails  =  await _getUserDetails(username, userDetailService)
     _authenticate(userDetails, credentials.password)
+
+    userDetails.password = credentials.password
     securityContext.injectUserAuth(userDetails)
 
     return userDetails
-
-def _extractCredentials(token : OAuth2PasswordBearer) -> tuple:
-    decodedToken = decode(token, key = KEY, algorithms = ["HS256"])
-
-    username = decodedToken["username"]
-    password = decodedToken["password"]
-    return username, password
 
 async def _getUserDetails(username: str, userDetailService : UserDetailService) -> UserAuth:
         userData = await userDetailService.getUserDetails(username)
@@ -54,7 +48,6 @@ async def _getUserDetails(username: str, userDetailService : UserDetailService) 
             raise AuthenticationFailedException(username = username, cause = "Incorrect username")
         else:
             return userData
-
 
 def _authenticate(userData: UserAuth, authPasswordClaim: str) -> None:
     encryptionContext = getEncryptionContext()

@@ -7,7 +7,7 @@ from sqlalchemy.orm import  mapped_column
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from repository.ormBase import Base
 from security.userAuth import UserAuth
-from security.authentication.userDetailServices.userDetailServiceManager import UserDetailService
+from security.userDetailServices.UserDetailService import UserDetailService
 
 
 class SqlLiteUserDetailService(UserDetailService):

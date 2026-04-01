@@ -1,9 +1,7 @@
 ﻿from abc import ABC, abstractmethod
 from typing import List
 
-from passlib.context import CryptContext
-
-from security.EncryptionContext import getEncryptionContext
+from security.encription.EncryptionContext import getEncryptionContext
 from security.userAuth import UserAuth
 
 
@@ -13,9 +11,9 @@ class UserDetailService(ABC):
         pass
     async def createUser(self, username: str, password:str, roles: List[str]) -> None:
         encryptionContext = getEncryptionContext()
-        truncatedPwd = password[:72]
-        hashedPwd = encryptionContext.hash(truncatedPwd)
+        hashedPwd = encryptionContext.hash(password)
         await self._createUser(username, hashedPwd, roles)
+
     @abstractmethod
     async def _createUser(self, username: str, password: str, roles: List[str]) -> None:
         pass
