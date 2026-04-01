@@ -3,7 +3,7 @@ import logging
 import sys
 
 from fastapi import FastAPI
-from jwt import InvalidTokenError
+from jwt import InvalidTokenError, ExpiredSignatureError
 from sqlalchemy.util import has_dupes
 from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_409_CONFLICT, HTTP_404_NOT_FOUND, HTTP_403_FORBIDDEN, \
     HTTP_400_BAD_REQUEST
@@ -13,7 +13,7 @@ from starlette.responses import JSONResponse
 from exceptions.customExceptions import NotFoundException, ResourceAlreadyExistsException, ForbiddenException, \
     AuthenticationFailedException
 
-logger = logging.getLogger()
+logger = logging.getLogger("exception-handlers")
 
 def handledException(ex : type[Exception]):
     def decorator(func):
@@ -49,6 +49,11 @@ def resource_already_exists_exception_handler(request: Request, exception: Resou
 def invalid_token_exception_handler(request: Request, exception: InvalidTokenError):
     return JSONResponse(status_code= HTTP_401_UNAUTHORIZED, content= {"message": "invalid JWT token"})
 
+@handledException(ExpiredSignatureError)
+def expired_token_exception_handler(request: Request, exception: ExpiredSignatureError):
+    logger.error(f"request with id: {request.state.requestId} has launched ExpiredSignatureError")
+    return JSONResponse(status_code= HTTP_401_UNAUTHORIZED, content= {"message": "token has expired"})
+
 @handledException(ForbiddenException)
 def forbidden_exception_handler(request: Request, exception: ForbiddenException):
     return JSONResponse(status_code = HTTP_403_FORBIDDEN, content= {"message": f"access denied to resource, with cause: {exception.cause}"})
@@ -60,3 +65,4 @@ def authentication_exception_handler(request: Request, exception: Authentication
 @handledException(ValueError)
 def validation_exception_handler(request: Request, exception: ValueError):
     return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content = {"message" : f"{exception}"})
+

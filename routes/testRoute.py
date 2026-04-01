@@ -4,7 +4,7 @@ from fastapi import Depends
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_201_CREATED
 from DTOs.requestDTOs.AlbumDTO import AlbumDTO
-from security.authentication.jwtAuthentication import authenticateWithJwt
+from security.authentication.authentication import authenticateWithJwt
 from security.authorization.roleAuthorization import authorizeAnyRole
 from security.userAuth import UserAuth
 from services.musicService import injectMusicService, MusicService
