@@ -25,13 +25,13 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
 
         requestId  = str(uuid.uuid4())
         message += f"\nassigned request id: {requestId}"
-        request.requestId = requestId
+        request.state.requestId = requestId
 
         logger.info(message)
 
         response = await call_next(request)
 
-        logger.info(f"request with id: {request.requestId} generated response with status code: {response.status_code}")
+        logger.info(f"request with id: {request.state.requestId} generated response with status code: {response.status_code}")
         logger.warning("im aware that some headers should never be printed (e.g. authorization), but this is just and exercise")
 
         return response
