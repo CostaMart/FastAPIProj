@@ -5,6 +5,7 @@ from exceptions.handlers import registerAllExceptionHandlers
 from middleware.requestLoggingMiddleware import RequestLoggingMiddleware
 from repository.ormBase import initDb
 from routes.testRoute import rt
+from routes.authRoutes import rt as authrt
 
 
 @asynccontextmanager
@@ -24,6 +25,7 @@ app.add_middleware(RequestLoggingMiddleware)
 
 # routes
 app.include_router(rt)
+app.include_router(authrt)
 
 
 

@@ -1,12 +1,10 @@
-﻿from typing import Set
-
+﻿from typing import Set, List
 from sqlalchemy import select
+from sqlalchemy.dialects.mysql import insert
 from sqlalchemy.orm.attributes import Mapped
-
-from sqlalchemy import  String, create_engine
-from sqlalchemy.orm import declarative_base, mapped_column
+from sqlalchemy import  String
+from sqlalchemy.orm import  mapped_column
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-
 from repository.ormBase import Base
 from security.userAuth import UserAuth
 from security.authentication.userDetailServices.userDetailServiceManager import UserDetailService
@@ -14,6 +12,13 @@ from security.authentication.userDetailServices.userDetailServiceManager import 
 
 class SqlLiteUserDetailService(UserDetailService):
     """this sqllite database is NOT encrypted, of course this is just an exercise"""
+
+    async def _createUser(self, username: str, password: str, roles : List[str]) -> None:
+        await self.session.execute(
+            insert(UserAuthOrm).values(username=username, password=password, _roles = str.join(",", roles))
+        )
+        await self.session.commit()
+
 
     async def __aenter__(self):
         self.session = self.async_sessionmaker()

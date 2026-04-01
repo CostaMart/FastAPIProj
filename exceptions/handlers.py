@@ -5,7 +5,8 @@ import sys
 from fastapi import FastAPI
 from jwt import InvalidTokenError
 from sqlalchemy.util import has_dupes
-from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_409_CONFLICT, HTTP_404_NOT_FOUND, HTTP_403_FORBIDDEN
+from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_409_CONFLICT, HTTP_404_NOT_FOUND, HTTP_403_FORBIDDEN, \
+    HTTP_400_BAD_REQUEST
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
@@ -55,3 +56,7 @@ def forbidden_exception_handler(request: Request, exception: ForbiddenException)
 @handledException(AuthenticationFailedException)
 def authentication_exception_handler(request: Request, exception: AuthenticationFailedException):
     return JSONResponse(status_code = HTTP_401_UNAUTHORIZED, content= {"message": f"Unauthorized, with reason: {exception.cause}"})
+
+@handledException(ValueError)
+def validation_exception_handler(request: Request, exception: ValueError):
+    return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content = {"message" : f"{exception}"})

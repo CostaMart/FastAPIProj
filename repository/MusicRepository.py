@@ -3,8 +3,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 from sqlalchemy.orm import selectinload
 
 # import tables
-from repository.model.Artist import Artist
-from repository.model.Album import Album
+from model import Artist, Album
 
 DATABASE_URL = "sqlite+aiosqlite:///./test.db"
 engine = create_async_engine(DATABASE_URL, connect_args={"check_same_thread": False})
