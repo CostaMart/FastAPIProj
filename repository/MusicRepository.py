@@ -12,13 +12,12 @@ engine = create_async_engine(DATABASE_URL, connect_args={"check_same_thread": Fa
 
 class MusicRepository:
 
-    def __init__(self):
-        self.async_sessionmaker: async_sessionmaker = async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
-        self.session: AsyncSession | None = None
-
-    def __init__(self, thisEngine: AsyncEngine):
+    def __init__(self, thisEngine : AsyncEngine = None) -> None:
+        if thisEngine is None:
+            thisEngine = engine
         self.async_sessionmaker: async_sessionmaker = async_sessionmaker(autocommit=False, autoflush=False, bind=thisEngine)
         self.session: AsyncSession | None = None
+
 
     async def __aenter__(self):
         self.session = self.async_sessionmaker()

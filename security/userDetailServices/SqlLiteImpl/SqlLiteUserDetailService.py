@@ -29,17 +29,12 @@ class SqlLiteUserDetailService(UserDetailService):
         await self.session.__aexit__(exc_type, exc_val, exc_tb)
         self.session = None
 
-    def __init__(self):
-        self.DATABASE_URL = "sqlite+aiosqlite:///./test.db"
+    def __init__(self, engine : AsyncEngine = None) -> None:
+        if engine is None:
+            self.DATABASE_URL = "sqlite+aiosqlite:///./test.db"
         self.engine = create_async_engine(self.DATABASE_URL, connect_args={"check_same_thread": False})
         self.async_sessionmaker : async_sessionmaker = async_sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
         self.session: AsyncSession = None
-
-    def __init__(self, engine : AsyncEngine) -> None:
-        self.engine = engine
-        self.async_sessionmaker : async_sessionmaker = async_sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
-        self.session: AsyncSession = None
-
 
 
     async def getUserDetails(self, username: str) -> UserAuth | None:

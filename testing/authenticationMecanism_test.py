@@ -37,7 +37,7 @@ async def test_authenticateWithJwt():
     assert userDetails is not None
 
 @pytest.mark.asyncio
-async def test_authenticateWithBasic():
+async def test_authenticateWithBasic_success():
     userDetailsService = MockUserDetailService()
     mockCredentials = MockBasicCredentials()
 
