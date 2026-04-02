@@ -18,8 +18,5 @@ def JwtExtractCredentials(token : OAuth2PasswordBearer) -> tuple:
 
     username = decodedToken["username"]
     password = decodedToken["password"]
-    exp = decodedToken["exp"]
-
-
     return username, password
 

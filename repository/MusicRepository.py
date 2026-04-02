@@ -1,9 +1,10 @@
 ﻿from sqlalchemy import select, insert
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession, AsyncEngine
 from sqlalchemy.orm import selectinload
 
 # import tables
-from model import Artist, Album
+from model.Artist import Artist
+from model.Album import  Album
 
 DATABASE_URL = "sqlite+aiosqlite:///./test.db"
 engine = create_async_engine(DATABASE_URL, connect_args={"check_same_thread": False})
@@ -13,6 +14,10 @@ class MusicRepository:
 
     def __init__(self):
         self.async_sessionmaker: async_sessionmaker = async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
+        self.session: AsyncSession | None = None
+
+    def __init__(self, thisEngine: AsyncEngine):
+        self.async_sessionmaker: async_sessionmaker = async_sessionmaker(autocommit=False, autoflush=False, bind=thisEngine)
         self.session: AsyncSession | None = None
 
     async def __aenter__(self):

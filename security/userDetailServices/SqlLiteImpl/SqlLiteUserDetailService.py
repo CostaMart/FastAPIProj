@@ -4,7 +4,7 @@ from sqlalchemy.dialects.mysql import insert
 from sqlalchemy.orm.attributes import Mapped
 from sqlalchemy import  String
 from sqlalchemy.orm import  mapped_column
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession, AsyncEngine
 from repository.ormBase import Base
 from security.userAuth import UserAuth
 from security.userDetailServices.UserDetailService import UserDetailService
@@ -34,6 +34,12 @@ class SqlLiteUserDetailService(UserDetailService):
         self.engine = create_async_engine(self.DATABASE_URL, connect_args={"check_same_thread": False})
         self.async_sessionmaker : async_sessionmaker = async_sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
         self.session: AsyncSession = None
+
+    def __init__(self, engine : AsyncEngine) -> None:
+        self.engine = engine
+        self.async_sessionmaker : async_sessionmaker = async_sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
+        self.session: AsyncSession = None
+
 
 
     async def getUserDetails(self, username: str) -> UserAuth | None:

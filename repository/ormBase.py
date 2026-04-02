@@ -3,8 +3,6 @@ from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
-# load repositories to init
-import repository.MusicRepository
 
 async def initDb():
     print("database init")
