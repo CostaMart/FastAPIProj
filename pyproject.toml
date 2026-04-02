@@ -1,5 +1,5 @@
 [project]
-name = "pytest"
+name = "MyFastApiApp"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -40,6 +40,8 @@ dependencies = [
     "pydantic==2.12.5",
     "pydantic-core==2.41.5",
     "pyjwt==2.12.1",
+    "pytest>=9.0.2",
+    "pytest-asyncio>=1.3.0",
     "pyyaml==6.0.3",
     "requests==2.33.0",
     "requests-toolbelt==1.0.0",
