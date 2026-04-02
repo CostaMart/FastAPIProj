@@ -1,5 +1,8 @@
 ﻿from fastapi.security import OAuth2PasswordBearer, HTTPBasicCredentials, HTTPBasic
 from fastapi import Depends
+from langgraph_sdk import EncryptionContext
+from passlib.context import CryptContext
+
 from exceptions.customExceptions import AuthenticationFailedException
 from security.encription.EncryptionContext import getEncryptionContext
 from security.SecurityContext import injectSecurityContext, SecurityContext
@@ -14,13 +17,14 @@ getBasicCredentials = HTTPBasic()
 async def authenticateWithJwt(
         token : OAuth2PasswordBearer = Depends(getBearerToken),
         userDetailService : UserDetailService = Depends(getUserDetailService),
-        securityContext : SecurityContext = Depends(injectSecurityContext)
+        securityContext : SecurityContext = Depends(injectSecurityContext),
+        encryptionContext : CryptContext = Depends(getEncryptionContext)
 ):
 
     username, passwordClaim =  JwtExtractCredentials(token)
     userDetails = await _getUserDetails(username, userDetailService)
 
-    _authenticate(userDetails, passwordClaim)
+    _authenticate(userDetails, passwordClaim, encryptionContext)
     userDetails.password = passwordClaim
 
     securityContext.injectUserAuth(userDetails)
@@ -30,11 +34,13 @@ async def authenticateWithJwt(
 async def authenticateWithBasic(
         credentials : HTTPBasicCredentials = Depends(getBasicCredentials),
         userDetailService : UserDetailService = Depends(getUserDetailService),
-        securityContext : SecurityContext = Depends(injectSecurityContext)
+        securityContext : SecurityContext = Depends(injectSecurityContext),
+        encryptionContext: EncryptionContext = Depends(getEncryptionContext)
+
 ):
     username = credentials.username
     userDetails  =  await _getUserDetails(username, userDetailService)
-    _authenticate(userDetails, credentials.password)
+    _authenticate(userDetails, credentials.password, encryptionContext)
 
     userDetails.password = credentials.password
     securityContext.injectUserAuth(userDetails)
@@ -49,13 +55,12 @@ async def _getUserDetails(username: str, userDetailService : UserDetailService) 
         else:
             return userData
 
-def _authenticate(userData: UserAuth, authPasswordClaim: str) -> None:
-    encryptionContext = getEncryptionContext()
+def _authenticate(userData: UserAuth, authPasswordClaim: str, encryptionContext : CryptContext) -> None:
 
     if userData is None:
         raise AuthenticationFailedException(cause = "Incorrect username")
 
-    if encryptionContext.verify(authPasswordClaim, userData.password):
+    if not encryptionContext.verify(authPasswordClaim, userData.password):
         raise AuthenticationFailedException(cause = "Incorrect password")
 
     userData.auth = True

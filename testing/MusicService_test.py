@@ -1,26 +1,29 @@
 ﻿import pytest
 import pytest_asyncio
 import sqlalchemy as sql
+from pydantic_core.core_schema import none_schema
 from sqlalchemy.dialects.mysql import insert
 
 import os
 
 from sqlalchemy.ext.asyncio.engine import create_async_engine
 
+from DTOs.requestDTOs import AlbumDTO
 from model.Album import Album
 from model.Artist import Artist
 from repository.MusicRepository import MusicRepository
 from repository.injectors import injectMusicRepository
 from repository.ormBase import Base
 from services.injectors import injectMusicService
+from services.musicService import MusicService
 from testing.SQLliteUserDetails_test import databaseUrl
 
 databaseUrl = "sqlite+aiosqlite:///:memory:"
 
 @pytest_asyncio.fixture
 async def prepareRepo():
-    engine = await prepareDb()
-    yield engine
+    repo = await prepareDb()
+    yield repo
 
 
 async def prepareDb():
@@ -39,35 +42,24 @@ async def prepareDb():
                 artist_id = 0,
             )
         )
-    return engine
 
+    return MusicRepository(engine)
 
 @pytest.mark.asyncio
-async def test_getAlbum(prepareRepo):
-    repo = MusicRepository(prepareRepo)
-    async with repo as re:
-        album = await re.getAlbumAndArtistByAlbumTitle("marco's album")
+async def test_createAlbum(prepareRepo):
+    async with prepareRepo as repo:
+        service = MusicService(repo)
+        albumDTO = AlbumDTO(title= "album", artist= "marco")
+        await service.createNewAlbum(albumDTO)
+
+@pytest.mark.asyncio
+async def test_getAuthorByAlbum(prepareRepo):
+    async with prepareRepo as repo:
+        service = MusicService(repo)
+        album = await service.getAuthorByAlbumName("marco's album")
         assert album is not None
 
-
-@pytest.mark.asyncio
-async def test_getArtist(prepareRepo):
-    repo = MusicRepository(prepareRepo)
-    async with repo as re:
-        artist = re.getArtistByName("marco")
-        assert artist is not None
-
-@pytest.mark.asyncio
-async def test_insertAlbum(prepareRepo):
-    repo = MusicRepository(prepareRepo)
-    async with repo as re:
-        try:
-            re.createNewAlbum("new Album", 0)
-        except Exception as e:
-            pytest.fail(f"creation as failed: {e}")
-
-
-def test_injectRepo():
-    repo = injectMusicRepository()
-    assert repo is not None
+def test_injectService(prepareRepo):
+    service = injectMusicService(prepareRepo)
+    assert service is not None
 

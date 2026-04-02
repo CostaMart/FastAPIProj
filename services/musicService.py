@@ -1,8 +1,8 @@
 ﻿from fastapi import Depends
 from exceptions.customExceptions import NotFoundException
-from repository.MusicRepository import MusicRepository, injectMusicRepository
+from repository.MusicRepository import MusicRepository
 from model.Artist import Artist
-from routes.testRoute import AlbumDTO
+from DTOs.requestDTOs.AlbumDTO import AlbumDTO
 
 
 class MusicService:
@@ -28,6 +28,3 @@ class MusicService:
 
 
 
-
-def injectMusicService(musicRepository : MusicRepository  = Depends(injectMusicRepository)):
-    return MusicService(musicRepository)

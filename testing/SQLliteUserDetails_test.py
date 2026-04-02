@@ -10,11 +10,8 @@ databaseUrl = "sqlite+aiosqlite:///:memory:"
 
 @pytest_asyncio.fixture
 async def prepareRepo():
-    print("creating artist repository")
     engine = await prepareDb()
     yield engine
-    print("fine")
-
 
 async def prepareDb():
     engine = create_async_engine(databaseUrl)

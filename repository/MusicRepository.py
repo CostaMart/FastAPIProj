@@ -44,7 +44,3 @@ class MusicRepository:
         await self.session.execute(insert(Album).values(title=albumName, artist_id=authorId))
         await self.session.commit()
 
-
-async def injectMusicRepository():
-   async with MusicRepository() as repo:
-       yield repo

@@ -7,7 +7,8 @@ from DTOs.requestDTOs.AlbumDTO import AlbumDTO
 from security.authentication.authentication import authenticateWithJwt
 from security.authorization.roleAuthorization import authorizeAnyRole
 from security.userAuth import UserAuth
-from services.musicService import injectMusicService, MusicService
+from services.injectors import injectMusicService
+from services.musicService import  MusicService
 
 
 rt = APIRouter()
