@@ -6,6 +6,7 @@ from sqlalchemy import  String
 from sqlalchemy.orm import  mapped_column
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession, AsyncEngine
 from repository.ormBase import Base
+from security.Role import Role
 from security.userAuth import UserAuth
 from security.userDetailServices.UserDetailService import UserDetailService
 
@@ -13,9 +14,11 @@ from security.userDetailServices.UserDetailService import UserDetailService
 class SqlLiteUserDetailService(UserDetailService):
     """this sqllite database is NOT encrypted, of course this is just an exercise"""
 
-    async def _createUser(self, username: str, password: str, roles : List[str]) -> None:
+    async def _createUser(self, username: str, password: str, roles : List[Role]) -> None:
+        rolesString = [role.value for role in roles]
+        
         await self.session.execute(
-            insert(UserAuthOrm).values(username=username, password=password, _roles = str.join(",", roles))
+            insert(UserAuthOrm).values(username=username, password=password, _roles = str.join(",", rolesString))
         )
         await self.session.commit()
 
@@ -42,7 +45,7 @@ class SqlLiteUserDetailService(UserDetailService):
         authOrm = queryResult.scalar_one_or_none()
 
         if authOrm is not None:
-            return UserAuth(str(authOrm.username), str(authOrm.password), authOrm.roles)
+            return UserAuth.model_validate(authOrm)
         else:
             return None
 
@@ -53,7 +56,7 @@ class UserAuthOrm(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String, unique=True)
     password: Mapped[str] = mapped_column(String)
-    _roles: Mapped[str] = mapped_column(String)
+    _roles: Mapped[str] = mapped_column("roles", String)
 
     @property
     def roles(self) -> Set[str]:

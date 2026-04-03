@@ -6,7 +6,7 @@ from passlib.context import CryptContext
 from exceptions.customExceptions import AuthenticationFailedException
 from security.encription.EncryptionContext import getEncryptionContext
 from security.SecurityContext import injectSecurityContext, SecurityContext
-from security.userDetailServices import UserDetailService
+from security.userDetailServices.UserDetailService import UserDetailService
 from security.jwtService import JwtExtractCredentials
 from security.userAuth import UserAuth
 from security.userDetailServices.userDetailServiceInjector import getUserDetailService
@@ -35,7 +35,7 @@ async def authenticateWithBasic(
         credentials : HTTPBasicCredentials = Depends(getBasicCredentials),
         userDetailService : UserDetailService = Depends(getUserDetailService),
         securityContext : SecurityContext = Depends(injectSecurityContext),
-        encryptionContext: EncryptionContext = Depends(getEncryptionContext)
+        encryptionContext: CryptContext = Depends(getEncryptionContext)
 
 ):
     username = credentials.username

@@ -4,6 +4,7 @@ from starlette import status
 from starlette.responses import JSONResponse
 
 from DTOs.requestDTOs.SubscriptionDTO import SubscriptionDTO
+from security.Role import Role
 from security.authentication.authentication import authenticateWithBasic
 from security.jwtService import produceNewJwt
 from security.userAuth import UserAuth
@@ -15,7 +16,7 @@ rt = APIRouter()
 @rt.post("/subscribe")
 async def subscribe(subscription: SubscriptionDTO, service : UserDetailService  = Depends(getUserDetailService)):
     password = subscription.password
-    await service.createUser(subscription.username, subscription.password, ["MARIO"])
+    await service.createUser(subscription.username, subscription.password, [Role.MARIO])
     return JSONResponse(status_code=status.HTTP_201_CREATED, content= {"message": "user created successfully"})
 
 @rt.post("/login")

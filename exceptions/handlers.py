@@ -4,6 +4,7 @@ import sys
 
 from fastapi import FastAPI
 from jwt import InvalidTokenError, ExpiredSignatureError
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.util import has_dupes
 from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_409_CONFLICT, HTTP_404_NOT_FOUND, HTTP_403_FORBIDDEN, \
     HTTP_400_BAD_REQUEST
@@ -65,4 +66,7 @@ def authentication_exception_handler(request: Request, exception: Authentication
 @handledException(ValueError)
 def validation_exception_handler(request: Request, exception: ValueError):
     return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content = {"message" : f"{exception}"})
+@handledException(IntegrityError)
+def integrity_exception_handler(request: Request, exception: IntegrityError):
+    return JSONResponse(status_code=HTTP_409_CONFLICT, content= {"message" : "a user with the same nickname already exists"})
 
