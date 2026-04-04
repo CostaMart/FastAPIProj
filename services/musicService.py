@@ -1,4 +1,5 @@
-﻿from fastapi import Depends
+﻿from typing import Sequence
+from fastapi import Depends
 from exceptions.customExceptions import NotFoundException
 from repository.MusicRepository import MusicRepository
 from model.Artist import Artist
@@ -24,6 +25,11 @@ class MusicService:
             return # resource creation is idempotent
 
         await self.musicRepository.createNewAlbum(album.title, artist.id)
+
+    async def getArtistByNameWithAlbums(self, name: str) -> Sequence[Artist]:
+        artists = await self.musicRepository.getArtistByNameWithAlbum(name)
+        return artists
+
 
 
 

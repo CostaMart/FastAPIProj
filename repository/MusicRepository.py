@@ -1,4 +1,6 @@
-﻿from sqlalchemy import select, insert
+﻿from typing import List, Sequence
+
+from sqlalchemy import select, insert
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession, AsyncEngine
 from sqlalchemy.orm import selectinload
 
@@ -42,4 +44,13 @@ class MusicRepository:
     async def createNewAlbum(self, albumName, authorId):
         await self.session.execute(insert(Album).values(title=albumName, artist_id=authorId))
         await self.session.commit()
+
+    async def getArtistByNameWithAlbum(self, name : str) -> Sequence[Artist]:
+        ormResult = await self.session.execute(
+            select(Artist).options(selectinload(Artist.albums)).where(Artist.name == name)
+        )
+
+        return ormResult.scalars().all()
+
+
 

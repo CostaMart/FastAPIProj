@@ -3,17 +3,18 @@
 from fastapi import Depends
 
 from exceptions.customExceptions import ForbiddenException
+from security.Role import Role
 from security.SecurityContext import injectSecurityContext, SecurityContext
 
 
-def _hasAnyRole(requiredRole: Set[str], userRole: Set[str]):
+def _hasAnyRole(requiredRole: Set[Role], userRole: Set[Role]):
     return userRole.issubset(requiredRole)
 
-def _hasAllRoles(requiredRole: Set[str], userRole: Set[str]):
+def _hasAllRoles(requiredRole: Set[Role], userRole: Set[Role]):
     return userRole == requiredRole
 
 
-def authorizeAnyRole(requiredRoles: Set[str]):
+def authorizeAnyRole(requiredRoles: Set[Role]):
 
     def checker(securityContext: SecurityContext = Depends(injectSecurityContext)):
         userRole = securityContext.userAuth.roles
@@ -24,7 +25,7 @@ def authorizeAnyRole(requiredRoles: Set[str]):
     return checker
 
 
-def authorizeWithAllRoles(requiredRoles: Set[str]):
+def authorizeWithAllRoles(requiredRoles: Set[Role]):
 
     def checker(securityContext: SecurityContext = Depends(injectSecurityContext)):
         userRole = securityContext.userAuth.roles
