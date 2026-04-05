@@ -1,6 +1,6 @@
 ﻿from typing import List, Sequence
 
-from sqlalchemy import select, insert
+from sqlalchemy import select, insert, text
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession, AsyncEngine
 from sqlalchemy.orm import selectinload
 
@@ -18,7 +18,7 @@ class MusicRepository:
         if thisEngine is None:
             thisEngine = engine
         self.async_sessionmaker: async_sessionmaker = async_sessionmaker(autocommit=False, autoflush=False, bind=thisEngine)
-        self.session: AsyncSession | None = None
+        self.session: AsyncSession
 
 
     async def __aenter__(self):
@@ -51,6 +51,19 @@ class MusicRepository:
         )
 
         return ormResult.scalars().all()
+
+    async def executeFreeQuery(self, sqlQuery):
+        async with self.session.begin() as db:
+            result = await self.session.execute(text(sqlQuery))
+            toReturn = result.fetchall()
+            if type(toReturn) == list:
+                if len(list(toReturn)) == 0:
+                    return (
+                        f"an empty list was fecthed"
+                    )
+            return toReturn
+
+
 
 
 

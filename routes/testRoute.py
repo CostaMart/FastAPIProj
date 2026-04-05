@@ -10,8 +10,8 @@ from security.authentication.authentication import authenticateWithJwt
 from security.authorization.roleAuthorization import authorizeAnyRole
 from security.userAuth import UserAuth
 from services.LLMService import LLMService
-from services.LLMService import injectLLMService
-from services.injectors import injectMusicService
+
+from services.injectors import injectMusicService, injectLLMService
 from services.musicService import  MusicService
 
 
@@ -39,7 +39,7 @@ async def getArtist(name: str, musicService : MusicService = Depends(injectMusic
 
 @rt.post("/chat", response_class= StreamingResponse)
 async def chatWithAssistant(message : LLMmessage, llm : LLMService = Depends(injectLLMService)):
-    for message in llm.sendMessage(message.content):
+    async for message in llm.sendMessage(message.content):
         yield message.content
 
 
