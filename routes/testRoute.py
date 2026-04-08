@@ -2,6 +2,7 @@
 from fastapi.routing import APIRouter
 from fastapi import Depends
 from pydantic import BaseModel
+from sqlalchemy.util.cython import returns
 from starlette.responses import JSONResponse, StreamingResponse
 from starlette.status import HTTP_201_CREATED
 from DTOs.requestDTOs.AlbumDTO import AlbumDTO
@@ -9,7 +10,7 @@ from security.Role import Role
 from security.authentication.authentication import authenticateWithJwt
 from security.authorization.roleAuthorization import authorizeAnyRole
 from security.userAuth import UserAuth
-from services.LLMService import LLMService
+from services.OllamaService import OllamaService
 
 from services.injectors import injectMusicService, injectLLMService
 from services.musicService import  MusicService
@@ -38,9 +39,10 @@ async def getArtist(name: str, musicService : MusicService = Depends(injectMusic
 
 
 @rt.post("/chat", response_class= StreamingResponse)
-async def chatWithAssistant(message : LLMmessage, llm : LLMService = Depends(injectLLMService)):
-    async for message in llm.sendMessage(message.content):
-        yield message.content
+async def chatWithAssistant(message : LLMmessage, llm : OllamaService = Depends(injectLLMService)):
+     yield "we are creating your response, please wait...\n"
+     message  = await llm.sendMessage(message.content)
+     yield message.content + "\n"
 
 
 class LLMmessage(BaseModel):

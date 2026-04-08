@@ -52,16 +52,10 @@ class MusicRepository:
 
         return ormResult.scalars().all()
 
-    async def executeFreeQuery(self, sqlQuery):
+    async def executeFreeQuery(self, sqlQuery) ->  Sequence:
         async with self.session.begin() as db:
             result = await self.session.execute(text(sqlQuery))
-            toReturn = result.fetchall()
-            if type(toReturn) == list:
-                if len(list(toReturn)) == 0:
-                    return (
-                        f"an empty list was fecthed"
-                    )
-            return toReturn
+            return result.fetchall()
 
 
 
