@@ -1,9 +1,8 @@
 import re
 from langchain_core.messages import AIMessage, HumanMessage
-import sqlparse
 
 
-class SQLSanitizer:
+class InputOutputSanitizer:
     pattern : str = re.compile(
         r"""
         \b(
@@ -34,10 +33,9 @@ class SQLSanitizer:
             patternToUse = self.pattern
 
         match  = re.findall(patternToUse, text)
-
         return bool(match)
 
-    def produceInputFailOutput(self) -> AIMessage:
+    def getInputRejectedResponse(self) -> AIMessage:
         return AIMessage("Your message is not acceptable.")
 
     def isInputMalicious(self, text:str) -> bool:

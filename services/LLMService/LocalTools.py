@@ -38,14 +38,16 @@ async def handle_tool_errors(request, handler):
             tool_call_id=request.tool_call["id"]
         )
 
-def containsReadQuery(query:str) -> bool :
-    parsed = sqlparse.parse(query)[0]
-    type = parsed.get_type()
-    return type == "SELECT"
 
 
 logger = logging.getLogger(__name__)
 class ToolCallSanitizer(BaseCallbackHandler):
+    """
+        NOTE: this would not be necessary in a real environment.
+        Instead of limiting the kind of queries the model can run we can just assign a user with not write privileges
+        in the database
+     """
+
     raise_error = True
     def on_tool_start(self, serialized, input_str, **kwargs):
         query = extract_query(input_str)
@@ -59,7 +61,10 @@ class ToolCallSanitizer(BaseCallbackHandler):
         else:
             raise Exception("only read query are permitted")
 
-        print("tool call permitted")
+def containsReadQuery(query:str) -> bool :
+    parsed = sqlparse.parse(query)[0]
+    type = parsed.get_type()
+    return type == "SELECT"
 
 def extract_query(s: str) -> str | None:
     match = re.search(r"'sqlQuery':\s*[\"'](.+?)[\"']}", s)
