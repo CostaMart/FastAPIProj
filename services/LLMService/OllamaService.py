@@ -28,6 +28,9 @@ class OllamaService(BaseForLLM):
                  modelName = "qwen3.5:latest"):
 
         super().__init__(sanitizer)
+
+        self.logger.info(f"this is the toolist: {toolList}")
+
         self.repo = repo
         model = ChatOllama(model = modelName, reasoning= True)
 
