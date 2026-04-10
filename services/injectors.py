@@ -1,4 +1,5 @@
-﻿from typing import List, Callable
+﻿from opcode import i
+from typing import List, Callable
 
 from fastapi import Depends
 from langchain_mcp_adapters.client import MultiServerMCPClient
@@ -13,7 +14,7 @@ from services.musicService import MusicService
 def InjectToolList():
     return [executeQuery]
 
-async def InjectToolListMCP():
+async def injectToolListMCP():
     client =  MultiServerMCPClient({
         "music" : {
             "url": "http://localhost:8081/sse",
@@ -25,5 +26,5 @@ async def InjectToolListMCP():
 def injectMusicService(musicRepository : MusicRepository  = Depends(injectMusicRepository)):
     return MusicService(musicRepository)
 
-def injectLLMService(repo = Depends(injectMusicRepository), sanitizer = InputOutputSanitizer(), toolList : List[Callable] = Depends(InjectToolListMCP)):
+def injectLLMService(repo = Depends(injectMusicRepository), sanitizer = InputOutputSanitizer(), toolList : List[Callable] = Depends(injectToolListMCP)):
     return OllamaService(repo, sanitizer, toolList)
